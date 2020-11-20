@@ -98,16 +98,16 @@ int main( int argc, char** argv )
 	 * create output stream
 	 */
 	videoOutput* output = videoOutput::Create(cmdLine, ARG_POSITION(1));
-	
+
 	if( !output )
-		LogError("detectnet:  failed to create output stream\n");	
-	
+		LogError("detectnet:  failed to create output stream\n");
+
 
 	/*
 	 * create detection network
 	 */
 	detectNet* net = detectNet::Create(cmdLine);
-	
+
 	if( !net )
 	{
 		LogError("detectnet:  failed to load detectNet model\n");
@@ -116,7 +116,7 @@ int main( int argc, char** argv )
 
 	// parse overlay flags
 	const uint32_t overlayFlags = detectNet::OverlayFlagsFromStr(cmdLine.GetString("overlay", "box,labels,conf"));
-	
+
 
 	/*
 	 * processing loop
@@ -130,7 +130,7 @@ int main( int argc, char** argv )
 		{
 			// check for EOS
 			if( !input->IsStreaming() )
-				break; 
+				break;
 
 			LogError("detectnet:  failed to capture video frame\n");
 			continue;
@@ -138,19 +138,19 @@ int main( int argc, char** argv )
 
 		// detect objects in the frame
 		detectNet::Detection* detections = NULL;
-	
+
 		const int numDetections = net->Detect(image, input->GetWidth(), input->GetHeight(), &detections, overlayFlags);
-		
+
 		if( numDetections > 0 )
 		{
 			LogVerbose("%i objects detected\n", numDetections);
-		
+
 			for( int n=0; n < numDetections; n++ )
 			{
 				LogVerbose("detected obj %i  class #%u (%s)  confidence=%f\n", n, detections[n].ClassID, net->GetClassDesc(detections[n].ClassID), detections[n].Confidence);
-				LogVerbose("bounding box %i  (%f, %f)  (%f, %f)  w=%f  h=%f\n", n, detections[n].Left, detections[n].Top, detections[n].Right, detections[n].Bottom, detections[n].Width(), detections[n].Height()); 
+				LogVerbose("bounding box %i  (%f, %f)  (%f, %f)  w=%f  h=%f\n", n, detections[n].Left, detections[n].Top, detections[n].Right, detections[n].Bottom, detections[n].Width(), detections[n].Height());
 			}
-		}	
+		}
 
 		// render outputs
 		if( output != NULL )
@@ -170,13 +170,11 @@ int main( int argc, char** argv )
 		// print out timing info
 		net->PrintProfilerTimes();
 	}
-	
 
 	/*
 	 * destroy resources
 	 */
 	LogVerbose("detectnet:  shutting down...\n");
-	
 	SAFE_DELETE(input);
 	SAFE_DELETE(output);
 	SAFE_DELETE(net);

@@ -19,7 +19,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
- 
+
 #ifndef __DETECT_NET_H__
 #define __DETECT_NET_H__
 
@@ -134,13 +134,13 @@ public:
 
 		/**< Return true if the coordinate is inside the bounding box */
 		inline bool Contains( float x, float y ) const							{ return x >= Left && x <= Right && y >= Top && y <= Bottom; }
-		
-		/**< Return true if the bounding boxes intersect and exceeds area % threshold */	
+
+		/**< Return true if the bounding boxes intersect and exceeds area % threshold */
 		inline bool Intersects( const Detection& det, float areaThreshold=0.0f ) const  { return (IntersectionArea(det) / fmaxf(Area(), det.Area()) > areaThreshold); }
-	
-		/**< Return true if the bounding boxes intersect and exceeds area % threshold */	
+
+		/**< Return true if the bounding boxes intersect and exceeds area % threshold */
 		inline bool Intersects( float x1, float y1, float x2, float y2, float areaThreshold=0.0f ) const  { return (IntersectionArea(x1,y1,x2,y2) / fmaxf(Area(), Area(x1,y1,x2,y2)) > areaThreshold); }
-	
+
 		/**< Return the area of the bounding box intersection */
 		inline float IntersectionArea( const Detection& det ) const					{ return IntersectionArea(det.Left, det.Top, det.Right, det.Bottom); }
 
@@ -149,18 +149,18 @@ public:
 
 		/**< Return true if the bounding boxes overlap */
 		inline bool Overlaps( const Detection& det ) const						{ return !(det.Left > Right || det.Right < Left || det.Top > Bottom || det.Bottom < Top); }
-		
+
 		/**< Return true if the bounding boxes overlap */
 		inline bool Overlaps( float x1, float y1, float x2, float y2 ) const			{ return !(x1 > Right || x2 < Left || y1 > Bottom || y2 < Top); }
-		
+
 		/**< Expand the bounding box if they overlap (return true if so) */
 		inline bool Expand( float x1, float y1, float x2, float y2 ) 	     		{ if(!Overlaps(x1, y1, x2, y2)) return false; Left = fminf(x1, Left); Top = fminf(y1, Top); Right = fmaxf(x2, Right); Bottom = fmaxf(y2, Bottom); return true; }
-		
+
 		/**< Expand the bounding box if they overlap (return true if so) */
 		inline bool Expand( const Detection& det )      							{ if(!Overlaps(det)) return false; Left = fminf(det.Left, Left); Top = fminf(det.Top, Top); Right = fmaxf(det.Right, Right); Bottom = fmaxf(det.Bottom, Bottom); return true; }
 
 		/**< Reset all member variables to zero */
-		inline void Reset()													{ Instance = 0; ClassID = 0; Confidence = 0; Left = 0; Right = 0; Top = 0; Bottom = 0; } 								
+		inline void Reset()													{ Instance = 0; ClassID = 0; Confidence = 0; Left = 0; Right = 0; Top = 0; Bottom = 0; }
 
 		/**< Default constructor */
 		inline Detection()													{ Reset(); }
@@ -176,7 +176,7 @@ public:
 		OVERLAY_LABEL 	    = (1 << 1),	/**< Overlay the class description labels */
 		OVERLAY_CONFIDENCE = (1 << 2),	/**< Overlay the detection confidence values */
 	};
-	
+
 	/**
 	 * Network choice enumeration.
 	 */
@@ -223,7 +223,7 @@ public:
 	static detectNet* Create( NetworkType networkType=PEDNET_MULTI, float threshold=DETECTNET_DEFAULT_THRESHOLD, 
 						 uint32_t maxBatchSize=DEFAULT_MAX_BATCH_SIZE, precisionType precision=TYPE_FASTEST, 
 						 deviceType device=DEVICE_GPU, bool allowGPUFallback=true );
-	
+
 	/**
 	 * Load a custom network instance
 	 * @param prototxt_path File path to the deployable network prototxt
@@ -236,15 +236,14 @@ public:
 	 * @param bboxes Name of the output bounding box layer blob, which contains a grid of rectangles in the image.
 	 * @param maxBatchSize The maximum batch size that the network will support and be optimized for.
 	 */
-	static detectNet* Create( const char* prototxt_path, const char* model_path, const char* mean_binary, 
-						 const char* class_labels, float threshold=DETECTNET_DEFAULT_THRESHOLD, 
-						 const char* input = DETECTNET_DEFAULT_INPUT, 
-						 const char* coverage = DETECTNET_DEFAULT_COVERAGE, 
+	static detectNet* Create( const char* prototxt_path, const char* model_path, const char* mean_binary,
+						 const char* class_labels, float threshold=DETECTNET_DEFAULT_THRESHOLD,
+						 const char* input = DETECTNET_DEFAULT_INPUT,
+						 const char* coverage = DETECTNET_DEFAULT_COVERAGE,
 						 const char* bboxes = DETECTNET_DEFAULT_BBOX,
-						 uint32_t maxBatchSize=DEFAULT_MAX_BATCH_SIZE, 
+						 uint32_t maxBatchSize=DEFAULT_MAX_BATCH_SIZE,
 						 precisionType precision=TYPE_FASTEST,
 				   		 deviceType device=DEVICE_GPU, bool allowGPUFallback=true );
-							  
 	/**
 	 * Load a custom network instance
 	 * @param prototxt_path File path to the deployable network prototxt
@@ -257,8 +256,8 @@ public:
 	 * @param bboxes Name of the output bounding box layer blob, which contains a grid of rectangles in the image.
 	 * @param maxBatchSize The maximum batch size that the network will support and be optimized for.
 	 */
-	static detectNet* Create( const char* prototxt_path, const char* model_path, float mean_pixel=0.0f, 
-						 const char* class_labels=NULL, float threshold=DETECTNET_DEFAULT_THRESHOLD, 
+	static detectNet* Create( const char* prototxt_path, const char* model_path, float mean_pixel=0.0f,
+						 const char* class_labels=NULL, float threshold=DETECTNET_DEFAULT_THRESHOLD,
 						 const char* input = DETECTNET_DEFAULT_INPUT, 
 						 const char* coverage = DETECTNET_DEFAULT_COVERAGE, 
 						 const char* bboxes = DETECTNET_DEFAULT_BBOX,
@@ -349,7 +348,7 @@ public:
 	 * @returns    The number of detected objects, 0 if there were no detected objects, and -1 if an error was encountered.
 	 */
 	int Detect( void* input, uint32_t width, uint32_t height, imageFormat format, Detection* detections, uint32_t overlay=OVERLAY_BOX );
-	
+
 	/**
 	 * Detect object locations from an RGBA image, returning an array containing the detection results.
       * @deprecated this overload of Detect() provides legacy compatibility with `float*` type (RGBA32F). 
@@ -459,7 +458,7 @@ public:
 	 * Procedurally generate a bounding box color for a class index.
 	 */
 	static void GenerateColor( uint32_t classID, uint8_t* rgb ); 
-	
+
 protected:
 
 	// constructor
@@ -472,7 +471,7 @@ protected:
 	bool init( const char* prototxt_path, const char* model_path, const char* mean_binary, const char* class_labels, 
 			 float threshold, const char* input, const char* coverage, const char* bboxes, uint32_t maxBatchSize, 
 			 precisionType precision, deviceType device, bool allowGPUFallback );
-	
+
 	int clusterDetections( Detection* detections, uint32_t width, uint32_t height );
 	int clusterDetections( Detection* detections, int n, float threshold=0.75f );
 

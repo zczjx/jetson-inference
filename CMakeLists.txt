@@ -8,7 +8,7 @@ message("Note:  this project uses git submodules in the source tree.")
 message("       if you haven't already, run the following command from")
 message("       the project's root directory:")
 message(" ")
-message("           git submodule update --init") 
+message("           git submodule update --init")
 message("\n")
 
 if( NOT EXISTS "${PROJECT_SOURCE_DIR}/utils/.git" )
@@ -57,8 +57,8 @@ message("-- CUDA version: ${CUDA_VERSION}")
 
 set(
 	CUDA_NVCC_FLAGS
-	${CUDA_NVCC_FLAGS}; 
-    -O3 
+	${CUDA_NVCC_FLAGS};
+    -O3
 	-gencode arch=compute_53,code=sm_53
 	-gencode arch=compute_62,code=sm_62
 )
@@ -68,7 +68,7 @@ if(CUDA_VERSION_MAJOR GREATER 9)
 
 	set(
 		CUDA_NVCC_FLAGS
-		${CUDA_NVCC_FLAGS}; 
+		${CUDA_NVCC_FLAGS};
 		-gencode arch=compute_72,code=sm_72
 	)
 endif()
@@ -113,7 +113,7 @@ if(BUILD_EXPERIMENTAL)
 			message("-- OpenCV version >= 3.0.0, enabling OpenCV")
 			set(HAS_OPENCV 1)
 			add_definitions(-DHAS_OPENCV)
-		endif()	
+		endif()
 	endif()
 
 	file(GLOB experimentalSources c/experimental/*.cpp c/experimental/*.cu)
@@ -126,7 +126,7 @@ else()
 	message("-- BUILD_EXPERIMENTAL disabled")
 	file(GLOB pluginSources plugins/*.cpp plugins/*.cu)
 endif()
-	
+
 cuda_add_library(jetson-inference SHARED ${inferenceSources} ${pluginSources})
 
 
@@ -146,7 +146,7 @@ endforeach()
 execute_process( COMMAND "${CMAKE_COMMAND}" "-E" "create_symlink" "${PROJECT_SOURCE_DIR}/data/networks" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/networks" )
 execute_process( COMMAND "${CMAKE_COMMAND}" "-E" "create_symlink" "${PROJECT_SOURCE_DIR}/data/images" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/images" )
 
-  
+
 # copy image data (EDIT: these are now symlinked above)
 #file(GLOB imageData ${PROJECT_SOURCE_DIR}/data/images/*)
 
@@ -171,7 +171,7 @@ target_link_libraries(jetson-inference jetson-utils nvinfer nvinfer_plugin nvcaf
 if(CUDA_VERSION_MAJOR GREATER 9)
 	target_link_libraries(jetson-inference nvonnxparser)
 
-    if(HAS_OPENCV) 
+    if(HAS_OPENCV)
         message("-- Linking jetson-inference with OpenCV " ${OpenCV_VERSION})
         target_link_libraries(jetson-inference opencv_core opencv_calib3d)
     endif()

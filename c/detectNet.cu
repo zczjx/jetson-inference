@@ -26,7 +26,7 @@
 
 
 template<typename T>
-__global__ void gpuDetectionOverlay( T* input, T* output, int width, int height, detectNet::Detection* detections, int numDetections, float4* colors ) 
+__global__ void gpuDetectionOverlay( T* input, T* output, int width, int height, detectNet::Detection* detections, int numDetections, float4* colors )
 {
 	const int x = blockIdx.x * blockDim.x + threadIdx.x;
 	const int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -36,10 +36,10 @@ __global__ void gpuDetectionOverlay( T* input, T* output, int width, int height,
 
 	const T px_in = input[ y * width + x ];
 	T px_out = px_in;
-	
+
 	const float fx = x;
 	const float fy = y;
-	
+
 	for( int n=0; n < numDetections; n++ )
 	{
 		const detectNet::Detection det = detections[n];
@@ -47,7 +47,7 @@ __global__ void gpuDetectionOverlay( T* input, T* output, int width, int height,
 		// check if this pixel is inside the bounding box
 		if( fx >= det.Left && fx <= det.Right && fy >= det.Top && fy <= det.Bottom )
 		{
-			const float4 color = colors[det.ClassID];	
+			const float4 color = colors[det.ClassID];
 
 			const float alpha = color.w / 255.0f;
 			const float ialph = 1.0f - alpha;
@@ -57,8 +57,8 @@ __global__ void gpuDetectionOverlay( T* input, T* output, int width, int height,
 			px_out.z = alpha * color.z + ialph * px_out.z;
 		}
 	}
-	
-	output[y * width + x] = px_out;	 
+
+	output[y * width + x] = px_out;
 }
 
 
@@ -85,7 +85,7 @@ __global__ void gpuDetectionOverlayBox( T* input, T* output, int imgWidth, int i
 	px.x = alpha * color.x + ialph * px.x;
 	px.y = alpha * color.y + ialph * px.y;
 	px.z = alpha * color.z + ialph * px.z;
-	
+
 	output[y * imgWidth + x] = px;
 }
 
@@ -94,7 +94,7 @@ cudaError_t launchDetectionOverlay( T* input, T* output, uint32_t width, uint32_
 {
 	if( !input || !output || width == 0 || height == 0 || !detections || numDetections == 0 || !colors )
 		return cudaErrorInvalidValue;
-			
+
 	// this assumes that the output already has the input image copied to it,
 	// which if input != output, is done first by detectNet::Detect()
 	for( int n=0; n < numDetections; n++ )
@@ -106,7 +106,7 @@ cudaError_t launchDetectionOverlay( T* input, T* output, uint32_t width, uint32_
 		const dim3 blockDim(8, 8);
 		const dim3 gridDim(iDivUp(boxWidth,blockDim.x), iDivUp(boxHeight,blockDim.y));
 
-		gpuDetectionOverlayBox<T><<<gridDim, blockDim>>>(input, output, width, height, (int)detections[n].Left, (int)detections[n].Top, boxWidth, boxHeight, colors[detections[n].ClassID]); 
+		gpuDetectionOverlayBox<T><<<gridDim, blockDim>>>(input, output, width, height, (int)detections[n].Left, (int)detections[n].Top, boxWidth, boxHeight, colors[detections[n].ClassID]);
 	}
 
 	return cudaGetLastError();
@@ -115,13 +115,13 @@ cudaError_t launchDetectionOverlay( T* input, T* output, uint32_t width, uint32_
 cudaError_t cudaDetectionOverlay( void* input, void* output, uint32_t width, uint32_t height, imageFormat format, detectNet::Detection* detections, int numDetections, float4* colors )
 {
 	if( format == IMAGE_RGB8 )
-		return launchDetectionOverlay<uchar3>((uchar3*)input, (uchar3*)output, width, height, detections, numDetections, colors); 
+		return launchDetectionOverlay<uchar3>((uchar3*)input, (uchar3*)output, width, height, detections, numDetections, colors);
 	else if( format == IMAGE_RGBA8 )
-		return launchDetectionOverlay<uchar4>((uchar4*)input, (uchar4*)output, width, height, detections, numDetections, colors);  
+		return launchDetectionOverlay<uchar4>((uchar4*)input, (uchar4*)output, width, height, detections, numDetections, colors);
 	else if( format == IMAGE_RGB32F )
-		return launchDetectionOverlay<float3>((float3*)input, (float3*)output, width, height, detections, numDetections, colors);  
+		return launchDetectionOverlay<float3>((float3*)input, (float3*)output, width, height, detections, numDetections, colors);
 	else if( format == IMAGE_RGBA32F )
-		return launchDetectionOverlay<float4>((float4*)input, (float4*)output, width, height, detections, numDetections, colors); 
+		return launchDetectionOverlay<float4>((float4*)input, (float4*)output, width, height, detections, numDetections, colors);
 	else
 		return cudaErrorInvalidValue;
 }

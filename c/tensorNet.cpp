@@ -1448,7 +1448,7 @@ void tensorNet::SetStream( cudaStream_t stream )
 
 	if( !mStream )
 		return;
-}	
+}
 
 
 // ProcessNetwork
